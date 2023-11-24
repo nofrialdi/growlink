@@ -29,6 +29,7 @@ import { format } from "path";
 import { updateDataPertanian } from "@/services/transactions-service";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { convertISOToDate } from "@/helper/utils";
 
 interface Product {
   id: number;
@@ -62,6 +63,7 @@ export default function UpdatePertanian({
   const [harvestTime, setHarvestTime] = useState("");
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(0);
+  const [productId, setProductId] = useState("");
   const [yields, setYields] = useState<Yields[]>([]);
   const [selectedPlantingDate, setSelectedPlantingDate] = useState(null);
   const [selectedHarvestDate, setSelectedHarvestDate] = useState(null);
@@ -94,6 +96,7 @@ export default function UpdatePertanian({
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedProduct(event.target.value as string);
+    setProductId(event.target.value as string);
   };
 
   async function getYields() {
@@ -113,6 +116,7 @@ export default function UpdatePertanian({
       setHarvestTime(data.harvestTime);
       setDescription(data.description);
       setQuantity(data.quantity);
+      setProductId(data.productId);
     } catch (error) {
       console.log(error);
     }
@@ -294,7 +298,7 @@ export default function UpdatePertanian({
           sx={{ display: "flex", justifyContent: "space-between" }}
         >
           <Button
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/pertanian")}
             startIcon={<ArrowBackIosNewIcon />}
             variant="text"
             sx={{ color: "#ffffff" }}
@@ -327,10 +331,11 @@ export default function UpdatePertanian({
           <InputLabel id="produkSelected">Produk</InputLabel>
           <Select
             onChange={handleChange}
-            value={selectedProduct}
+            value={productId}
             labelId="produkSelected"
             label="Produk"
             name="productId"
+            defaultValue={productId} // Gunakan nilai defaultValue sesuai dengan productId yang ingin Anda jadikan nilai default
           >
             {products?.map((product) => (
               <MenuItem key={product.id} value={product.id}>
@@ -350,7 +355,11 @@ export default function UpdatePertanian({
             <DatePicker
               format="DD/MM/YYYY"
               label="Tanggal Tanam"
-              value={selectedPlantingDate}
+              value={
+                plantingTime
+                  ? convertISOToDate(plantingTime)
+                  : selectedPlantingDate
+              }
               onChange={(date) => handlePlantingDateChange(date)}
             />
           </LocalizationProvider>

@@ -28,3 +28,16 @@ export const formatToRupiah = (amount: number) => {
     const options = { day: "numeric", month: "long", year: "numeric" };
     return date.toLocaleDateString("id-ID", options as any);
   };
+
+  export const convertISOToDate=(isoDate: string) => {
+    const date = new Date(isoDate);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+  
+    const formattedDate = `${day < 10 ? '0' + day : day}/${
+      month < 10 ? '0' + month : month
+    }/${year}`;
+  
+    return formattedDate;
+  }
