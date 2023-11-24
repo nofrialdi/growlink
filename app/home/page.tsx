@@ -5,12 +5,16 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useRouter } from "next/navigation";
 import AccountMenu from "../components/accountMenu";
 import Navigation from "../components/navigation2";
-import { getListTransactions } from "@/services/transactions-service";
+import {
+  getListTransactions,
+  getListYields,
+} from "@/services/transactions-service";
 import { formatToRupiah } from "@/helper/utils";
 
 export default function Home() {
   const router = useRouter();
   const [data, setData] = useState<any>();
+  const [dataYield, setDataYield] = useState<any>();
   const [totalSaldo, setTotalSaldo] = useState(0);
   const [totalPengeluaran, setTotalPengeluaran] = useState(0);
   const [totalPemasukan, setTotalPemasukan] = useState(0);
@@ -33,12 +37,19 @@ export default function Home() {
     setData(res);
   };
 
+  const getYield = async () => {
+    const res: any = await getListYields();
+    setDataYield(res);
+  };
+  console.log(dataYield);
+
   useEffect(() => {
     getUser();
     getList();
     getTotal();
     getTotalExpense();
     getTotalIncome();
+    getYield();
   }, [data]);
 
   const getTotal = async () => {
@@ -85,6 +96,8 @@ export default function Home() {
   };
 
   const lastItem = data && data.length > 0 ? data[data.length - 1] : null;
+  const lastItemYield =
+    dataYield && dataYield.length > 0 ? dataYield[dataYield.length - 1] : null;
 
   return (
     <Container
@@ -247,41 +260,43 @@ export default function Home() {
         </Box>
 
         <Box maxWidth={"sm"} sx={{ width: "100%", my: 1 }}>
-          <Box
-            sx={{
-              backgroundColor: "#ffffff",
-              height: 80,
-              alignItems: "center",
-              display: "flex",
-              justifyContent: "space-between",
-              padding: 2,
-              flexDirection: "row",
-              borderRadius: 1,
-            }}
-          >
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Typography variant="h6" component="h6">
-                Nasi Putih
-              </Typography>
-              <Typography variant="body1" component="p">
-                Nasi Putih lahan A
-              </Typography>
-              <Typography
-                sx={{ color: "warning.main" }}
-                variant="body1"
-                component="p"
-              >
-                Panen 20 November 2023
-              </Typography>
-            </Box>
+          {lastItemYield && (
+            <Box
+              sx={{
+                backgroundColor: "#ffffff",
+                height: 80,
+                alignItems: "center",
+                display: "flex",
+                justifyContent: "space-between",
+                padding: 2,
+                flexDirection: "row",
+                borderRadius: 1,
+              }}
+            >
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Typography variant="h6" component="h6">
+                  {lastItemYield?.name ? lastItemYield?.name : "-"}
+                </Typography>
+                <Typography variant="body1" component="p">
+                  {lastItemYield?.description}
+                </Typography>
+                <Typography
+                  sx={{ color: "warning.main" }}
+                  variant="body1"
+                  component="p"
+                >
+                  Panen {lastItemYield?.harvestTime}
+                </Typography>
+              </Box>
 
-            <Chip
-              sx={{ color: "warning.main", borderColor: "warning.main" }}
-              icon={<AccessTimeIcon color="warning" />}
-              label="2 Minggu"
-              variant="outlined"
-            />
-          </Box>
+              <Chip
+                sx={{ color: "warning.main", borderColor: "warning.main" }}
+                icon={<AccessTimeIcon color="warning" />}
+                label="2 Minggu"
+                variant="outlined"
+              />
+            </Box>
+          )}
         </Box>
         <Button fullWidth sx={{ my: 1, width: "100%" }} variant="contained">
           Lihat History Keuangan
