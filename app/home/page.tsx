@@ -6,11 +6,10 @@ import { useRouter } from "next/navigation";
 import AccountMenu from "../components/accountMenu";
 import Navigation from "../components/navigation2";
 import {
-  formatDate,
   getListTransactions,
   getListYields,
 } from "@/services/transactions-service";
-import { formatToRupiah } from "@/helper/utils";
+import { formatDate, formatToRupiah } from "@/helper/utils";
 
 export default function Home() {
   const router = useRouter();
