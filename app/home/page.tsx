@@ -9,7 +9,7 @@ import {
   getListTransactions,
   getListYields,
 } from "@/services/transactions-service";
-import { formatDate, formatToRupiah } from "@/helper/utils";
+import { formatDate, formatToRupiah, harvestDiffWeek } from "@/helper/utils";
 
 export default function Home() {
   const router = useRouter();
@@ -41,7 +41,6 @@ export default function Home() {
     const res: any = await getListYields();
     setDataYield(res);
   };
-  console.log(dataYield);
 
   useEffect(() => {
     getUser();
@@ -292,7 +291,9 @@ export default function Home() {
               <Chip
                 sx={{ color: "warning.main", borderColor: "warning.main" }}
                 icon={<AccessTimeIcon color="warning" />}
-                label="2 Minggu"
+                label={`${harvestDiffWeek(
+                  lastItemYield?.harvestTime as string
+                )} Minggu`}
                 variant="outlined"
               />
             </Box>
