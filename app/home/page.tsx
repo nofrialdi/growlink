@@ -11,6 +11,9 @@ import { formatToRupiah } from "@/helper/utils";
 export default function Home() {
   const router = useRouter();
   const [data, setData] = useState<any>();
+  const [totalSaldo, setTotalSaldo] = useState(0);
+  const [totalPengeluaran, setTotalPengeluaran] = useState(0);
+  const [totalPemasukan, setTotalPemasukan] = useState(0);
 
   async function getUser() {
     const response = await fetch(
@@ -23,7 +26,6 @@ export default function Home() {
         },
       }
     );
-    console.log(response);
   }
 
   const getList = async () => {
@@ -34,7 +36,53 @@ export default function Home() {
   useEffect(() => {
     getUser();
     getList();
-  }, []);
+    getTotal();
+    getTotalExpense();
+    getTotalIncome();
+  }, [data]);
+
+  const getTotal = async () => {
+    if (Array.isArray(data)) {
+      let totalAmount = 0;
+
+      for (let i = 0; i < data.length; i++) {
+        const dt = data[i];
+        totalAmount += dt?.amount || 0;
+      }
+
+      setTotalSaldo(totalAmount);
+    }
+  };
+
+  const getTotalExpense = async () => {
+    if (Array.isArray(data)) {
+      let totalExpenseAmount = 0;
+
+      for (let i = 0; i < data.length; i++) {
+        const dt = data[i];
+        if (dt?.type === "EXPENSE") {
+          totalExpenseAmount += dt?.amount || 0;
+        }
+      }
+
+      setTotalPengeluaran(totalExpenseAmount);
+    }
+  };
+
+  const getTotalIncome = async () => {
+    if (Array.isArray(data)) {
+      let totalIncomeAmount = 0;
+
+      for (let i = 0; i < data.length; i++) {
+        const dt = data[i];
+        if (dt?.type === "INCOME") {
+          totalIncomeAmount += dt?.amount || 0;
+        }
+      }
+
+      setTotalPemasukan(totalIncomeAmount);
+    }
+  };
 
   const lastItem = data && data.length > 0 ? data[data.length - 1] : null;
 
@@ -81,7 +129,7 @@ export default function Home() {
             Total Saldo
           </Typography>
           <Typography variant="h5" component="h5">
-            Rp. 1000.000
+            {formatToRupiah(totalSaldo)}
           </Typography>
         </Box>
         <Box
@@ -114,7 +162,7 @@ export default function Home() {
               component="h6"
               sx={{ color: "success.main" }}
             >
-              + Rp. 2000.000
+              + {formatToRupiah(totalPemasukan)}
             </Typography>
           </Box>
 
@@ -138,7 +186,7 @@ export default function Home() {
               component="h6"
               sx={{ color: "error.main" }}
             >
-              - Rp. 1000.000
+              - Rp. {formatToRupiah(totalPengeluaran)}
             </Typography>
           </Box>
         </Box>
