@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import AccountMenu from "../components/accountMenu";
 import Navigation from "../components/navigation2";
 import {
+  formatDate,
   getListTransactions,
   getListYields,
 } from "@/services/transactions-service";
@@ -285,7 +286,7 @@ export default function Home() {
                   variant="body1"
                   component="p"
                 >
-                  Panen {lastItemYield?.harvestTime}
+                  Panen {formatDate(lastItemYield?.harvestTime as string)}
                 </Typography>
               </Box>
 
