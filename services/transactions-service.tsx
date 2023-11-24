@@ -1,8 +1,13 @@
 import axios from "axios";
 
-const accessToken = localStorage.getItem("accessToken");
 let response: any;
-const bearer = `Bearer ${accessToken}`;
+let bearer = "";
+
+const accessToken = localStorage.getItem("accessToken");
+if (accessToken) {
+  bearer = `Bearer ${accessToken}`;
+}
+
 
 export const getListTransactions = async () => {
   if (accessToken) {

@@ -168,7 +168,7 @@ export default function Home() {
               <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Typography variant="h6" component="h6">
                   {lastItem?.transactionCategory
-                    ? lastItem?.transactionCategory
+                    ? lastItem?.transactionCategory?.name
                     : "-"}
                 </Typography>
                 <Typography variant="body1" component="p">
