@@ -1,0 +1,29 @@
+import axios from "axios";
+
+const accessToken = localStorage.getItem("accessToken");
+let response: any;
+const bearer = `Bearer ${accessToken}`;
+
+export const getListTransactions = async () => {
+  if (accessToken) {
+    const config = {
+      headers: {
+        Authorization: bearer,
+      },
+    };
+
+    try {
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVICE_BASE}/transactions`,
+        config
+      );
+      response = res.data;
+    } catch (error) {
+      response = error;
+    }
+  } else {
+    response = { error: "Access token not found" };
+  }
+
+  return response;
+};
