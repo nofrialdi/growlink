@@ -42,113 +42,122 @@ export default function Profile() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 
-	const [imageUploadKey, setImageUploadKey] = useState(Date.now());
+  const [imageUploadKey, setImageUploadKey] = useState(Date.now());
 
-	const imageKit = new ImageKit({
-		publicKey: publicKeyEnv,
-		privateKey: privateKeyEnv,
-		urlEndpoint: urlEndpointEnv,
-	});
+  const imageKit = new ImageKit({
+    publicKey: publicKeyEnv,
+    privateKey: privateKeyEnv,
+    urlEndpoint: urlEndpointEnv,
+  });
 
-	const updateImage = async () => {
-		setIsUploading(true);
-		try {
-			const file = imageInput ? imageInput[0] : undefined;
-			console.log(file);
+  useEffect(() => {
+    getUser();
+    if (imageInput) {
+      updateImage();
+    }
+  }, [imageInput, imageUploadKey]);
 
-			const imageKitResponse = await imageKit.upload({
-				file: file as any,
-				fileName: `${Date.now()}-${file}`,
-			});
+  const updateImage = async () => {
+    setIsUploading(true);
+    try {
+      const file = imageInput ? imageInput[0] : undefined;
 
-			setImageUrl(`${imageKitResponse.url}?${imageUploadKey}`);
-		} catch (error) {
-			console.log(error);
-		}
-		setIsUploading(false);
-	};
+      const imageKitResponse = await imageKit.upload({
+        file: file as any,
+        fileName: `${Date.now()}-${file}`,
+      });
 
-	useEffect(() => {
-		getUser();
-		updateImage();
-	}, [imageUploadKey]);
+      setImageUrl(`${imageKitResponse.url}?${imageUploadKey}`);
+    } catch (error) {
+      console.log(error);
+    }
+    setIsUploading(false);
+  };
 
-	const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setImageInput(e.target.files);
-	};
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImageInput(e.target.files);
+      updateImage();
+    }
+  };
 
-	const [showPassword, setShowPassword] = useState(false);
-	const handleClickShowPassword = () => setShowPassword((show) => !show);
-	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-		event.preventDefault();
-	};
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
 
-	async function getUser() {
-		const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICE_BASE}/user/me`, {
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-				"Content-Type": "application/json",
-			},
-		});
+  async function getUser() {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVICE_BASE}/user/me`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-		const data = await response.json();
-		setImageUrl(data.image);
-		setName(data.name);
-		setEmail(data.email);
-		setPhoneNumber(data.phoneNumber);
-		console.log(response);
-	}
+    const data = await response.json();
+    setImageUrl(data.image);
+    setName(data.name);
+    setEmail(data.email);
+    setPhoneNumber(data.phoneNumber);
+  }
 
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_SERVICE_BASE}/user/me`, {
-				method: "PATCH",
-				headers: {
-					Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					image: imageUrl,
-					name,
-					email,
-					password,
-					phoneNumber,
-				}),
-			});
-			console.log(response);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVICE_BASE}/user/me`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            image: imageUrl,
+            name,
+            email,
+            password,
+            phoneNumber,
+          }),
+        }
+      );
 
-			if (!response.ok) {
-				const error = await response.json();
-				toast.error(error.message, {
-					position: "top-center",
-					autoClose: 3000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-					progress: undefined,
-					theme: "colored",
-				});
-			} else {
-				const data = await response.json();
-				console.log("Response data: ", data);
-				toast.success("User updated successfully!", {
-					position: "top-center",
-					autoClose: 3000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-					progress: undefined,
-					theme: "colored",
-				});
-			}
-		} catch (err) {
-			console.log(err);
-		}
-	};
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.message, {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      } else {
+        const data = await response.json();
+        toast.success("User updated successfully!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
 	const VisuallyHiddenInput = styled("input")({
 		clip: "rect(0 0 0 0)",
