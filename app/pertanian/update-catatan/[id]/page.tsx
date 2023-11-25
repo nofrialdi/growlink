@@ -22,14 +22,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import React, { useEffect, useState } from "react";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import Navigation from "@/app/components/navigation2";
 import Shortcut from "@/app/components/shortcut";
 import { format } from "path";
 import { updateDataPertanian } from "@/services/transactions-service";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { convertISOToDate } from "@/helper/utils";
+import { convertDateDes, convertISOToDate } from "@/helper/utils";
 
 interface Product {
   id: number;
@@ -65,8 +65,11 @@ export default function UpdatePertanian({
   const [quantity, setQuantity] = useState(0);
   const [productId, setProductId] = useState("");
   const [yields, setYields] = useState<Yields[]>([]);
-  const [selectedPlantingDate, setSelectedPlantingDate] = useState(null);
-  const [selectedHarvestDate, setSelectedHarvestDate] = useState(null);
+  const [selectedPlantingDate, setSelectedPlantingDate] =
+    useState<Dayjs | null>(null);
+  const [selectedHarvestDate, setSelectedHarvestDate] = useState<Dayjs | null>(
+    null
+  );
 
   const handleHarvestDateChange = (date: any) => {
     setSelectedHarvestDate(date);
@@ -112,8 +115,14 @@ export default function UpdatePertanian({
         }
       );
       const data = await response.json();
-      setPlantingTime(data.plantingTime);
-      setHarvestTime(data.harvestTime);
+      const pt = convertDateDes(data.plantingTime);
+      setPlantingTime(pt);
+      setSelectedPlantingDate(dayjs(pt));
+
+      const ht = convertDateDes(data.harvestTime);
+      setHarvestTime(ht);
+      setSelectedPlantingDate(dayjs(ht));
+
       setDescription(data.description);
       setQuantity(data.quantity);
       setProductId(data.productId);
@@ -126,6 +135,18 @@ export default function UpdatePertanian({
     getProducts();
     getYields();
   }, []);
+
+  useEffect(() => {
+    if (plantingTime) {
+      setSelectedPlantingDate(dayjs(plantingTime));
+    }
+  }, [plantingTime]);
+
+  useEffect(() => {
+    if (harvestTime) {
+      setSelectedHarvestDate(dayjs(harvestTime));
+    }
+  }, [harvestTime]);
 
   var isoDateplantsString = plantingTime;
   const isoDatePlats = new Date(isoDateplantsString);
@@ -355,11 +376,7 @@ export default function UpdatePertanian({
             <DatePicker
               format="DD/MM/YYYY"
               label="Tanggal Tanam"
-              value={
-                plantingTime
-                  ? convertISOToDate(plantingTime)
-                  : selectedPlantingDate
-              }
+              value={selectedPlantingDate}
               onChange={(date) => handlePlantingDateChange(date)}
             />
           </LocalizationProvider>
