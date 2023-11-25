@@ -121,7 +121,7 @@ export default function UpdatePertanian({
 
       const ht = convertDateDes(data.harvestTime);
       setHarvestTime(ht);
-      setSelectedPlantingDate(dayjs(ht));
+      setSelectedHarvestDate(dayjs(ht));
 
       setDescription(data.description);
       setQuantity(data.quantity);
@@ -167,6 +167,7 @@ export default function UpdatePertanian({
 
     data.plantingTime = selectedPlantingDate;
     data.harvestTime = selectedHarvestDate;
+
     try {
       const res: any = await updateDataPertanian(params.id, data);
       if (res) {
