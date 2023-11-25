@@ -102,7 +102,7 @@ export default function Profile() {
     );
 
     const data = await response.json();
-    setImageUrl(data.image);
+    setImageUrl(data.imageUrl);
     setName(data.name);
     setEmail(data.email);
     setPhoneNumber(data.phoneNumber);
@@ -120,7 +120,7 @@ export default function Profile() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            image: imageUrl,
+            imageUrl: imageUrl,
             name,
             email,
             password,
